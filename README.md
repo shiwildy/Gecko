@@ -1,2 +1,2 @@
 # Gecko
-A blazingly fast, CLI-based local development environment for web development.
+A blazingly fast, CLI-based local environment for web development.

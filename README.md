@@ -1,43 +1,53 @@
-# Gecko 🦎
+# 🦎 Gecko
 
-## A Blazingly Fast, CLI-Based Local Development Environment for Modern Web Development.
+### The sleekest, fastest CLI dev environment you’ll ever meet.
 
-Inspired by the agility of a real-life gecko, this tool is designed to "stick" all your development services together seamlessly, ensuring a smooth and unhindered workflow.
+Gecko is your all-in-one, lightning-fast development toolkit powered by the speed of **Go**. Like the animal it’s named after, it’s light, fast, and sticks everything together—**seamlessly**.
+
+## 🔥 Why Gecko?
+
+You know that moment when you just want to build, not fight with config files and mismatched services?  
+Gecko gets it. That’s why it gives you:
+
+- ⚡ **Blazing Fast Performance**  
+  Written in Go. Starts in seconds. Stays out of your way.
+
+- 🧩 **Complete Dev Stack in One Command**  
+  Apache, MySQL, PhpMyAdmin, Ngrok, and more—already talking to each other out of the box.
+
+- 🌍 **Zero-Pain VHost Management**  
+  Create a new app and instantly access it via a custom local domain like `project.test`.
+
+- 🛠️ **Pure CLI Experience**  
+  No GUI, no bloat. Just fast, terminal-based control like the 10x dev you are.
+
+- 🚀 **Minimal Setup, Maximum Flow**  
+  One-liner to start. One-liner to deploy. Spend time coding, not configuring.
+
+## 🧪 Built for...
+
+- Freelancers who need fast project bootstrapping
+- Teams who want consistent local setups
+- Power users who live in their terminal
+- Anyone tired of saying “wait, why isn’t MySQL connecting again?”
+
+## 🙌 Contribute Like a Legend
+
+Fork it. Build it. PR it.  
+We love clean code, cool features, and passionate developers.
+
+## 📜 License
+
+Licensed under **GPLv3**. Read the `LICENSE` file like a responsible adult (or just start coding, we won’t judge).
+
+## 💚 Support the Project
+
+If Gecko saved you hours of setup rage, consider buying me some ☕:
+
+**Saweria:** [https://saweria.co/shiwildy](https://saweria.co/shiwildy)
+
+Even a little means a lot 🙏
 
 ---
 
-## What is Gecko?
-Gecko is a command-line interface (CLI) tool that provides you with a complete and portable development environment for building modern websites and web applications. It's built with **Go** for peak performance and minimal resource usage, allowing you to focus on what truly matters: **coding.**
-
----
-
-## Key Features
-
-* **⚡ Blazing Fast:** Built with Go. Starts up in seconds, not minutes.
-* **⚙️ All-in-One:** Apache, MySQL, PhpMyAdmin, Ngrok, & etc, all configured to work together. No more headaches.
-* **🔌 VHost:** Create App and access them directly as virtual domains.
-* **🖥️ Purely CLI:** Control everything from your favorite terminal. Lightweight, scriptable, and perfect for power users.
-* **🚀 Easy to Use:** Get your project running with just a few simple commands.
-
-
----
-
-## Contributing
-
-We welcome contributions from the community! If you'd like to contribute, simply submit a **Pull Request (PR)** directly.
-
----
-
-## License
-
-This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See the `LICENSE` file for more details.
-
----
-
-## Support My Work
-
-If you find Gecko useful and want to support its development, you can make a donation via Saweria:
-
-* **Saweria:** [https://saweria.co/shiwildy](https://saweria.co/shiwildy)
-
-Your support is greatly appreciated and helps keep this project going!
+> 🧠 Gecko isn't just a tool. It’s peace of mind in your terminal.

@@ -5,7 +5,7 @@
 #define MyAppExeName "gecko.exe"
 
 [Setup]
-AppId={{527E0227-F3E6-4C74-861F-3A64C85AF584}
+AppId={{527E0227-F3E6-4C74-861F-3A64C85AF581}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}

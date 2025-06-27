@@ -40,4 +40,4 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Registry]
-Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php;{app}\bin\mysql\bin;{app}\bin\ngrok";
+Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php\php;{app}\bin\mysql\bin;{app}\bin\ngrok";

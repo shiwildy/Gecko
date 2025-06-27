@@ -1,0 +1,6 @@
+bin/
+etc/
+tmp/
+logs/
+output/
+gecko.exe

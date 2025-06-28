@@ -12,9 +12,10 @@ const (
 )
 
 type Config struct {
-	ApachePort    string `json:"apache_port"`
-	ApacheSSLPort string `json:"apache_ssl_port"`
-	MySQLPort     string `json:"mysql_port"`
+	ApachePort      string `json:"apache_port"`
+	ApacheSSLPort   string `json:"apache_ssl_port"`
+	MySQLPort       string `json:"mysql_port"`
+	DevelopmentMode bool   `json:"development_mode"`
 }
 
 var globalConfig *Config
@@ -23,9 +24,10 @@ func LoadConfig() (*Config, error) {
 	if _, err := os.Stat(geckoConfigPath); os.IsNotExist(err) {
 		fmt.Printf("%sConfig file not found. Creating a default one at %s...%s\n", shared.ColorYellow, geckoConfigPath, shared.ColorReset)
 		defaultConfig := &Config{
-			ApachePort:    "80",
-			ApacheSSLPort: "443",
-			MySQLPort:     "3306",
+			ApachePort:      "80",
+			ApacheSSLPort:   "443",
+			MySQLPort:       "3306",
+			DevelopmentMode: false, // set disable as default
 		}
 		if err := SaveConfig(defaultConfig); err != nil {
 			return nil, fmt.Errorf("failed to create default config: %w", err)
@@ -41,13 +43,19 @@ func LoadConfig() (*Config, error) {
 
 	var config Config
 	if err := json.Unmarshal(file, &config); err != nil {
-		return nil, fmt.Errorf("failed to parse config file: %w", err)
-	}
-
-	if config.ApacheSSLPort == "" {
-		config.ApacheSSLPort = "443"
-		fmt.Println("Updating config file with default SSL port 443...")
-		SaveConfig(&config)
+		var rawConfig map[string]interface{}
+		if json.Unmarshal(file, &rawConfig) == nil {
+			if _, ok := rawConfig["development_mode"]; !ok {
+				rawConfig["development_mode"] = false
+			}
+			config.ApachePort = rawConfig["apache_port"].(string)
+			config.ApacheSSLPort = rawConfig["apache_ssl_port"].(string)
+			config.MySQLPort = rawConfig["mysql_port"].(string)
+			config.DevelopmentMode = rawConfig["development_mode"].(bool)
+			SaveConfig(&config)
+		} else {
+			return nil, fmt.Errorf("failed to parse config file: %w", err)
+		}
 	}
 
 	globalConfig = &config

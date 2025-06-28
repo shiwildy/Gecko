@@ -1,5 +1,6 @@
 {
   "apache_port": "80",
   "apache_ssl_port": "443",
-  "mysql_port": "3306"
+  "mysql_port": "3306",
+  "development_mode": false
 }

@@ -56,6 +56,7 @@ func mainMenu() {
 		choice = strings.TrimSpace(choice)
 
 		clearScreen()
+		// Mapping ini sudah dikoreksi sesuai menu.go
 		switch choice {
 		case "1":
 			if apacheStatus {
@@ -88,6 +89,10 @@ func mainMenu() {
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
 		case "9":
+			service.GenerateDefaultCertificate()
+			fmt.Println("\nPress Enter to continue...")
+			reader.ReadString('\n')
+		case "10":
 			if ngrokStatus {
 				service.StopNgrokTunnels()
 			} else {
@@ -95,11 +100,11 @@ func mainMenu() {
 			}
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "10":
+		case "11":
 			service.SetAuthToken(reader)
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "11":
+		case "12":
 			if cloudflareStatus {
 				service.StopCloudflareTunnel()
 			} else {
@@ -107,8 +112,8 @@ func mainMenu() {
 			}
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "12":
-			service.GenerateDefaultCertificate()
+		case "13":
+			service.ToggleDevelopmentMode()
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
 		case "x", "X":

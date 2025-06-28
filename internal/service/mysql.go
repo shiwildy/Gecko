@@ -60,25 +60,34 @@ func StartMySQL() {
 		return
 	}
 
-	fmt.Printf("%sAttempting to start MySQL on port %s...%s\n", shared.ColorYellow, config.MySQLPort, shared.ColorReset)
+	var bindAddress string
+	if config.DevelopmentMode {
+		bindAddress = "0.0.0.0"
+		fmt.Printf("%sAttempting to start MySQL in Development Mode (public)...%s\n", shared.ColorYellow, shared.ColorReset)
+	} else {
+		bindAddress = "127.0.0.1"
+		fmt.Printf("%sAttempting to start MySQL in Private Mode (local only)...%s\n", shared.ColorYellow, shared.ColorReset)
+	}
+
 	cmd := exec.Command(mysqlExe,
 		"--port="+config.MySQLPort,
+		"--bind-address="+bindAddress,
 		"--datadir="+mysqlDataDir,
 		"--log-error="+mysqlLogError,
 		"--log-bin="+mysqlBinLog,
 		"--console",
 	)
+
 	err = cmd.Start()
 	if err != nil {
 		fmt.Printf("%sError starting MySQL: %v%s\n", shared.ColorRed, err, shared.ColorReset)
 		return
 	}
-	fmt.Printf("%sMySQL started in background.%s\n", shared.ColorGreen, shared.ColorReset)
+	fmt.Printf("%sMySQL started in background on %s:%s.%s\n", shared.ColorGreen, bindAddress, config.MySQLPort, shared.ColorReset)
 }
 
 func InitializeMySQL() {
 	fmt.Printf("%sManual MySQL database initialization...%s\n", shared.ColorYellow, shared.ColorReset)
-
 	dir, _ := os.ReadDir(mysqlDataDir)
 
 	if len(dir) > 0 {
@@ -98,7 +107,6 @@ func InitializeMySQL() {
 		os.MkdirAll(mysqlDataDir, os.ModePerm)
 		fmt.Printf("%sData directory cleared.%s\n", shared.ColorGreen, shared.ColorReset)
 	}
-
 	runMysqlInstallDb()
 }
 

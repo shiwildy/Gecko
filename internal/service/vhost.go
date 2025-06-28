@@ -27,40 +27,48 @@ func createVHostFile(docRoot, domainName string, useSSL bool) error {
 	httpPort := config.ApachePort
 	sslPort := config.ApacheSSLPort
 
+	var requireLine string
+	if config.DevelopmentMode {
+		requireLine = "Require all granted"
+	} else {
+		requireLine = "Require local"
+	}
+
 	docRootApache := filepath.ToSlash(docRoot)
-	var configContent string
-	vhostTemplate := `<VirtualHost *:%[1]s>
-    ServerName %[2]s
-    DocumentRoot "%[3]s"
-    <Directory "%[3]s">
+	var configContent strings.Builder
+
+	vhostTemplate := `<VirtualHost *:%s>
+    ServerName %s
+    DocumentRoot "%s"
+    <Directory "%s">
         AllowOverride All
-        Require all granted
+        %s
     </Directory>
 </VirtualHost>
 `
-	configContent = fmt.Sprintf(vhostTemplate, httpPort, domainName, docRootApache)
+	configContent.WriteString(fmt.Sprintf(vhostTemplate, httpPort, domainName, docRootApache, docRootApache, requireLine))
 
 	if useSSL {
 		certPath := filepath.ToSlash(filepath.Join(vhostCertsDir, domainName+".crt"))
 		keyPath := filepath.ToSlash(filepath.Join(vhostKeysDir, domainName+".key"))
 		sslVHostTemplate := `
-<VirtualHost *:%[1]s>
-    ServerName %[2]s
-    DocumentRoot "%[3]s"
-    <Directory "%[3]s">
+<VirtualHost *:%s>
+    ServerName %s
+    DocumentRoot "%s"
+    <Directory "%s">
         AllowOverride All
-        Require all granted
+        %s
     </Directory>
     
     SSLEngine on
-    SSLCertificateFile      "%[4]s"
-    SSLCertificateKeyFile   "%[5]s"
+    SSLCertificateFile      "%s"
+    SSLCertificateKeyFile   "%s"
 </VirtualHost>`
-		configContent += fmt.Sprintf(sslVHostTemplate, sslPort, domainName, docRootApache, certPath, keyPath)
+		configContent.WriteString(fmt.Sprintf(sslVHostTemplate, sslPort, domainName, docRootApache, docRootApache, requireLine, certPath, keyPath))
 	}
 
 	configPath := filepath.Join(sitesEnabledDir, domainName+".conf")
-	return os.WriteFile(configPath, []byte(configContent), 0644)
+	return os.WriteFile(configPath, []byte(configContent.String()), 0644)
 }
 
 func isSSLEnabled() bool {

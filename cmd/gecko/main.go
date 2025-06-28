@@ -56,7 +56,7 @@ func mainMenu() {
 		choice = strings.TrimSpace(choice)
 
 		clearScreen()
-		// Mapping ini sudah dikoreksi sesuai menu.go
+		// Mapping ulang v1.0.1
 		switch choice {
 		case "1":
 			if apacheStatus {

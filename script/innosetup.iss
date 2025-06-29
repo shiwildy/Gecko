@@ -39,8 +39,8 @@ Source: "..\logs\*"; DestDir: "{app}\logs\"; Flags: ignoreversion recursesubdirs
 Source: "..\tmp\*"; DestDir: "{app}\tmp\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\etc\logo\logo.ico"
+Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\etc\logo\logo.ico"
 
 [Registry]
 Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php\php;{app}\bin\mysql\bin;{app}\bin\ngrok;{app}\bin\pgsql\bin;{app}\bin\cloudflared"; Tasks: modifypath

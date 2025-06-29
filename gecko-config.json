@@ -2,5 +2,7 @@
   "apache_port": "80",
   "apache_ssl_port": "443",
   "mysql_port": "3306",
+  "postgres_port": "5432",
+  "postgres_password": "",
   "development_mode": false
 }

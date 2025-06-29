@@ -20,7 +20,8 @@ func ChangeServicePorts(reader *bufio.Reader) {
 	fmt.Println(shared.ColorGreen, "Select a service to change its port:", shared.ColorReset)
 	fmt.Printf("1. Apache (HTTP: %s, HTTPS: %s)\n", config.ApachePort, config.ApacheSSLPort)
 	fmt.Printf("2. MySQL (Current: %s)\n", config.MySQLPort)
-	fmt.Println("0. Back to main menu")
+	fmt.Printf("3. PostgreSQL (Current: %s)\n", config.PostgresPort)
+	fmt.Println("x. Back to main menu")
 
 	fmt.Print(shared.ColorYellow, "\nEnter your choice: ", shared.ColorReset)
 	choiceStr, _ := reader.ReadString('\n')
@@ -38,7 +39,12 @@ func ChangeServicePorts(reader *bufio.Reader) {
 			StopMySQL()
 			StartMySQL()
 		}
-	case "0":
+	case "3":
+		changePostgresPort(reader, config)
+		if IsServiceRunning("postgres.exe") {
+			RestartPostgreSQL()
+		}
+	case "x":
 		fmt.Println("Returning to main menu.")
 	default:
 		fmt.Println(shared.ColorRed, "Invalid choice.", shared.ColorReset)
@@ -70,14 +76,19 @@ func changeApachePorts(reader *bufio.Reader, config *Config) {
 
 	fmt.Printf("%sUpdating Apache configuration files...%s\n", shared.ColorYellow, shared.ColorReset)
 
-	// update httpd-ssl config
+	// change apache http port
+	httpPortConfPath := `C:\Gecko\etc\config\httpd\httpd.conf`
+	updateFileWithPatterns(httpPortConfPath, map[string]string{
+		`(?m)^Listen\s+` + oldPortHTTP: "Listen " + newPortHTTP,
+	})
+
+	// change apache https port
 	sslConfPath := `C:\Gecko\etc\config\httpd\httpd-ssl.conf`
 	updateFileWithPatterns(sslConfPath, map[string]string{
-		`(?m)^Listen\s+` + oldPortSSL: "Listen " + newPortSSL,
+		`(?m)^Listen\s+` + oldPortSSL:              "Listen " + newPortSSL,
 		`<VirtualHost\s+[^:]+:` + oldPortSSL + `>`: "<VirtualHost _default_:" + newPortSSL + ">",
 	})
-	
-	// update all vhost config
+
 	vhostDir := `C:\Gecko\etc\config\httpd\sites-enabled`
 	files, err := os.ReadDir(vhostDir)
 	if err != nil {
@@ -89,10 +100,11 @@ func changeApachePorts(reader *bufio.Reader, config *Config) {
 		if strings.HasSuffix(file.Name(), ".conf") {
 			filePath := filepath.Join(vhostDir, file.Name())
 			fmt.Printf("Updating %s...\n", file.Name())
-			updateFileWithPatterns(filePath, map[string]string{
-				`*:` + oldPortHTTP: "*:" + newPortHTTP,
-				`*:` + oldPortSSL:  "*:" + newPortSSL,
-			})
+			patterns := map[string]string{
+				`\*:` + oldPortHTTP: "*:" + newPortHTTP,
+				`\*:` + oldPortSSL:  "*:" + newPortSSL,
+			}
+			updateFileWithPatterns(filePath, patterns)
 		}
 	}
 
@@ -106,7 +118,6 @@ func changeApachePorts(reader *bufio.Reader, config *Config) {
 	fmt.Printf("%sApache ports updated successfully in all config files.%s\n", shared.ColorGreen, shared.ColorReset)
 	fmt.Println(shared.ColorYellow + "Restart Apache to apply the new ports." + shared.ColorReset)
 }
-
 
 func changeMySQLPort(reader *bufio.Reader, config *Config) {
 	currentPort := config.MySQLPort
@@ -122,7 +133,7 @@ func changeMySQLPort(reader *bufio.Reader, config *Config) {
 	config.MySQLPort = newPortStr
 	if err := SaveConfig(config); err != nil {
 		fmt.Printf("%sFailed to save new MySQL port configuration: %v%s\n", shared.ColorRed, err, shared.ColorReset)
-		config.MySQLPort = currentPort // revert to memory
+		config.MySQLPort = currentPort
 		return
 	}
 
@@ -130,6 +141,29 @@ func changeMySQLPort(reader *bufio.Reader, config *Config) {
 	fmt.Println(shared.ColorYellow + "Restart MySQL to apply the new port." + shared.ColorReset)
 }
 
+func changePostgresPort(reader *bufio.Reader, config *Config) {
+	currentPort := config.PostgresPort
+	fmt.Printf(shared.ColorYellow+"Enter new port for PostgreSQL (current: %s): "+shared.ColorReset, currentPort)
+	newPortStr, _ := reader.ReadString('\n')
+	newPortStr = strings.TrimSpace(newPortStr)
+
+	if newPortStr == "" || newPortStr == currentPort {
+		fmt.Println("Operation cancelled or port is the same.")
+		return
+	}
+
+	config.PostgresPort = newPortStr
+	if err := SaveConfig(config); err != nil {
+		fmt.Printf("%sFailed to save new PostgreSQL port configuration: %v%s\n", shared.ColorRed, err, shared.ColorReset)
+		config.PostgresPort = currentPort
+		return
+	}
+
+	applyPostgresSecuritySettings(config.DevelopmentMode)
+
+	fmt.Printf("%sPostgreSQL port has been updated to %s.%s\n", shared.ColorGreen, newPortStr, shared.ColorReset)
+	fmt.Println(shared.ColorYellow + "Restart PostgreSQL to apply the new port." + shared.ColorReset)
+}
 
 func updateFileWithPatterns(filePath string, patterns map[string]string) {
 	input, err := os.ReadFile(filePath)
@@ -138,7 +172,7 @@ func updateFileWithPatterns(filePath string, patterns map[string]string) {
 		return
 	}
 	content := string(input)
-	
+
 	for pattern, replacement := range patterns {
 		re := regexp.MustCompile(pattern)
 		content = re.ReplaceAllString(content, replacement)

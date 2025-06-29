@@ -91,7 +91,7 @@ func StartNgrokTunnel(localDomain string) {
 		fmt.Printf("%sCould not load config for Ngrok: %v%s\n", shared.ColorRed, err, shared.ColorReset)
 		return
 	}
-	
+
 	apachePort := config.ApachePort
 	fmt.Printf("%sForwarding to port %s (from gecko-config.json)%s\n", shared.ColorYellow, apachePort, shared.ColorReset)
 
@@ -142,7 +142,6 @@ func StartNgrokTunnel(localDomain string) {
 	fmt.Printf("%sCould not establish tunnel after %d attempts.%s\n", shared.ColorRed, maxRetries, shared.ColorReset)
 	fmt.Println("Please check the Ngrok agent manually at http://127.0.0.1:4040")
 }
-
 
 func StopNgrokTunnels() {
 	fmt.Printf("%sStopping all Ngrok tunnels...%s\n", shared.ColorYellow, shared.ColorReset)

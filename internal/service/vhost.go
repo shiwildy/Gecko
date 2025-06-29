@@ -23,7 +23,7 @@ func createVHostFile(docRoot, domainName string, useSSL bool) error {
 	if err != nil {
 		return fmt.Errorf("could not load config to create vhost file: %w", err)
 	}
-	
+
 	httpPort := config.ApachePort
 	sslPort := config.ApacheSSLPort
 
@@ -234,7 +234,7 @@ func updateHostsFile(domainName string, add bool) error {
 			break
 		}
 	}
-	file.Close() 
+	file.Close()
 
 	newGeckoLines := []string{}
 	entry := "127.0.0.1 " + domainName
@@ -249,7 +249,7 @@ func updateHostsFile(domainName string, add bool) error {
 			newGeckoLines = append(newGeckoLines, line)
 		}
 	}
-	
+
 	if add && !found {
 		newGeckoLines = append(newGeckoLines, entry)
 	}
@@ -260,6 +260,6 @@ func updateHostsFile(domainName string, add bool) error {
 		finalContent += strings.Join(newGeckoLines, "\r\n") + "\r\n"
 		finalContent += geckoEndBlock
 	}
-	
+
 	return os.WriteFile(hostsFilePath, []byte(finalContent), 0644)
 }

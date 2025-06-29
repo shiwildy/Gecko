@@ -109,6 +109,10 @@ func GetPHPVersion() string {
 	return getVersion(`C:\Gecko\bin\php\php\php.exe`, "-v")
 }
 
+func GetPostgreSQLVersion() string {
+	return getVersion(`C:\Gecko\bin\pgsql\bin\postgres`, "--version")
+}
+
 // rollbek use pid detect
 func GetApachePort() string {
 	pids := getPIDsByProcessName("httpd.exe")
@@ -117,5 +121,10 @@ func GetApachePort() string {
 
 func GetMySQLPort() string {
 	pids := getPIDsByProcessName("mysqld.exe")
+	return findPortsByPIDs(pids)
+}
+
+func GetPostgreSQLPort() string {
+	pids := getPIDsByProcessName("postgres.exe")
 	return findPortsByPIDs(pids)
 }

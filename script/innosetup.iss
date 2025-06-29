@@ -1,5 +1,5 @@
 #define MyAppName "Gecko"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "ShiWildy"
 #define MyAppURL "https://github.com/shiwildy/Gecko.git"
 #define MyAppExeName "gecko.exe"
@@ -40,4 +40,4 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Registry]
-Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php\php;{app}\bin\mysql\bin;{app}\bin\ngrok";
+Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php\php;{app}\bin\mysql\bin;{app}\bin\ngrok;{app}\bin\pgsql\bin;{app}\bin\cloudflared";

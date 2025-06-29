@@ -18,7 +18,7 @@ import (
 
 func main() {
 	utils.CheckAndRequestAdmin()
-	
+
 	_, err := service.LoadConfig()
 	if err != nil {
 		fmt.Printf("%sFatal Error: Could not load or create configuration file: %v%s\n", shared.ColorRed, err, shared.ColorReset)
@@ -26,7 +26,7 @@ func main() {
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
 		return
 	}
-	
+
 	mainMenu()
 }
 
@@ -47,8 +47,10 @@ func mainMenu() {
 	for {
 		apacheStatus := service.IsServiceRunning("httpd.exe")
 		mysqlStatus := service.IsServiceRunning("mysqld.exe")
+		pgStatus := service.IsServiceRunning("postgres.exe")
 		ngrokStatus := service.IsServiceRunning("ngrok.exe")
 		cloudflareStatus := service.IsServiceRunning("cloudflared.exe")
+
 		cli.DisplayMenu(apacheStatus, mysqlStatus, ngrokStatus, cloudflareStatus)
 
 		fmt.Print(shared.ColorYellow, "\nEnter your choice: ", shared.ColorReset)
@@ -56,7 +58,6 @@ func mainMenu() {
 		choice = strings.TrimSpace(choice)
 
 		clearScreen()
-		// Mapping ulang v1.0.1
 		switch choice {
 		case "1":
 			if apacheStatus {
@@ -71,28 +72,42 @@ func mainMenu() {
 				service.StartMySQL()
 			}
 		case "3":
-			handleCreateVHost(reader)
+			if pgStatus {
+				service.StopPostgreSQL()
+			} else {
+				service.StartPostgreSQL()
+			}
 		case "4":
-			handleDeleteVHost(reader)
+			service.InitializePostgreSQL(reader)
+			fmt.Println("\nPress Enter to continue...")
+			reader.ReadString('\n')
 		case "5":
+			handleCreateVHost(reader)
+		case "6":
+			handleDeleteVHost(reader)
+		case "7":
 			service.InitializeMySQL()
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "6":
+		case "8":
 			service.ChangeServicePorts(reader)
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "7":
-			service.SwitchPHPVersion(reader)
-		case "8":
-			service.InstallGeckoRootCA()
-			fmt.Println("\nPress Enter to continue...")
-			reader.ReadString('\n')
 		case "9":
-			service.GenerateDefaultCertificate()
+			service.ViewPostgresPassword()
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
 		case "10":
+			service.SwitchPHPVersion(reader)
+		case "11":
+			service.InstallGeckoRootCA()
+			fmt.Println("\nPress Enter to continue...")
+			reader.ReadString('\n')
+		case "12":
+			service.GenerateDefaultCertificate()
+			fmt.Println("\nPress Enter to continue...")
+			reader.ReadString('\n')
+		case "13":
 			if ngrokStatus {
 				service.StopNgrokTunnels()
 			} else {
@@ -100,11 +115,11 @@ func mainMenu() {
 			}
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "11":
+		case "14":
 			service.SetAuthToken(reader)
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "12":
+		case "15":
 			if cloudflareStatus {
 				service.StopCloudflareTunnel()
 			} else {
@@ -112,7 +127,7 @@ func mainMenu() {
 			}
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
-		case "13":
+		case "16":
 			service.ToggleDevelopmentMode()
 			fmt.Println("\nPress Enter to continue...")
 			reader.ReadString('\n')
@@ -120,6 +135,7 @@ func mainMenu() {
 			fmt.Println(shared.ColorYellow, "\nStopping all services...", shared.ColorReset)
 			service.StopApache()
 			service.StopMySQL()
+			service.StopPostgreSQL()
 			service.StopNgrokTunnels()
 			service.StopCloudflareTunnel()
 			fmt.Println(shared.ColorGreen, "Bye!", shared.ColorReset)
@@ -216,7 +232,7 @@ func handleStartTunnel(reader *bufio.Reader, tunnelType string) {
 		fmt.Printf("%sError listing virtual hosts: %v%s\n", shared.ColorRed, err, shared.ColorReset)
 		return
 	}
-	
+
 	vhosts = append([]string{"localhost"}, vhosts...)
 
 	if len(vhosts) == 0 {

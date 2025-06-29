@@ -4,24 +4,24 @@ import (
 	"fmt"
 	"gecko/internal/shared"
 	"os"
-	"regexp"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
 const (
-	openSSLExe      = `C:\Gecko\bin\openssl\openssl.exe`
+	openSSLExe        = `C:\Gecko\bin\openssl\openssl.exe`
 	apacheSSLConfFile = `C:\Gecko\etc\config\httpd\httpd-ssl.conf`
-	sslBaseDir      = `C:\Gecko\etc\ssl`
-	caKeyPath       = `C:\Gecko\etc\ssl\GeckoRootCA.key`
-	caCertPath      = `C:\Gecko\etc\ssl\GeckoRootCA.pem`
-	caSubject       = "/C=ID/ST=DKI Jakarta/L=Jakarta Utara/O=Gecko/CN=Gecko Local Development CA"
-	vhostCertsDir   = `C:\Gecko\etc\ssl\certs`
-	vhostKeysDir    = `C:\Gecko\etc\ssl\keys`
-	defaultCertPath = `C:\Gecko\etc\ssl\gecko.crt`
-	defaultKeyPath  = `C:\Gecko\etc\ssl\gecko.key`
-	defaultVHostFile = `C:\Gecko\etc\config\httpd\sites-enabled\00-default.conf`
+	sslBaseDir        = `C:\Gecko\etc\ssl`
+	caKeyPath         = `C:\Gecko\etc\ssl\GeckoRootCA.key`
+	caCertPath        = `C:\Gecko\etc\ssl\GeckoRootCA.pem`
+	caSubject         = "/C=ID/ST=DKI Jakarta/L=Jakarta Utara/O=Gecko/CN=Gecko Local Development CA"
+	vhostCertsDir     = `C:\Gecko\etc\ssl\certs`
+	vhostKeysDir      = `C:\Gecko\etc\ssl\keys`
+	defaultCertPath   = `C:\Gecko\etc\ssl\gecko.crt`
+	defaultKeyPath    = `C:\Gecko\etc\ssl\gecko.key`
+	defaultVHostFile  = `C:\Gecko\etc\config\httpd\sites-enabled\00-default.conf`
 )
 
 func activateSSLListener() error {
@@ -29,7 +29,7 @@ func activateSSLListener() error {
 	if err != nil {
 		return err
 	}
-	
+
 	input, err := os.ReadFile(apacheSSLConfFile)
 	if err != nil {
 		return err
@@ -42,13 +42,13 @@ func activateSSLListener() error {
 	}
 
 	fmt.Printf("%sEnsuring '%s' in httpd-ssl.conf...%s\n", shared.ColorYellow, listenDirective, shared.ColorReset)
-		re := regexp.MustCompile(`(?m)^Listen\s+\d+`)
+	re := regexp.MustCompile(`(?m)^Listen\s+\d+`)
 	if re.MatchString(content) {
 		content = re.ReplaceAllString(content, listenDirective)
 	} else {
 		content = listenDirective + "\n" + content
 	}
-	
+
 	return os.WriteFile(apacheSSLConfFile, []byte(content), 0644)
 }
 
@@ -172,25 +172,24 @@ func generateCert(domainName, certOutPath, keyOutPath string) error {
 	return nil
 }
 
-
 func EnableDefaultVHostSSL() error {
 	config, err := GetConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Printf("%sEnabling SSL configuration for default host...%s\n", shared.ColorYellow, shared.ColorReset)
 	content, err := os.ReadFile(defaultVHostFile)
 	if err != nil {
 		return err
 	}
-	
+
 	vhostMarker := fmt.Sprintf("<VirtualHost *:%s>", config.ApacheSSLPort)
 	if strings.Contains(string(content), vhostMarker) {
 		fmt.Printf("%sDefault host SSL config already enabled. Skipping.%s\n", shared.ColorYellow, shared.ColorReset)
 		return nil
 	}
-	
+
 	sslBlock := fmt.Sprintf(`
 <VirtualHost *:%s>
     ServerName localhost

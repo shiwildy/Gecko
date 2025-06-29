@@ -10,7 +10,49 @@ import (
 	"time"
 )
 
-func applySecuritySettingsToVhosts(isDevMode bool) error {
+func applyPostgresSecuritySettings(isDevMode bool) error {
+	confPath := filepath.Join(pgsqlDataDir, "postgresql.conf")
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
+		return nil
+	}
+
+	content, err := os.ReadFile(confPath)
+	if err != nil {
+		return fmt.Errorf("could not read postgresql.conf: %w", err)
+	}
+
+	config, err := GetConfig()
+	if err != nil {
+		return err
+	}
+
+	var newListenAddress string
+	if isDevMode {
+		newListenAddress = "'*'"
+	} else {
+		newListenAddress = "'localhost'"
+	}
+
+	strContent := string(content)
+
+	reListen := regexp.MustCompile(`(?m)^#?\s*listen_addresses\s*=\s*'.*?'`)
+	if !reListen.MatchString(strContent) {
+		strContent = "listen_addresses = " + newListenAddress + "\n" + strContent
+	} else {
+		strContent = reListen.ReplaceAllString(strContent, "listen_addresses = "+newListenAddress)
+	}
+
+	rePort := regexp.MustCompile(`(?m)^#?\s*port\s*=\s*\d+`)
+	if !rePort.MatchString(strContent) {
+		strContent = "port = " + config.PostgresPort + "\n" + strContent
+	} else {
+		strContent = rePort.ReplaceAllString(strContent, "port = "+config.PostgresPort)
+	}
+
+	return os.WriteFile(confPath, []byte(strContent), 0644)
+}
+
+func applyApacheSecuritySettings(isDevMode bool) error {
 	var oldDirective, newDirective string
 	if isDevMode {
 		oldDirective = "Require local"
@@ -27,23 +69,16 @@ func applySecuritySettingsToVhosts(isDevMode bool) error {
 	if err != nil {
 		return fmt.Errorf("could not read vhost directory: %w", err)
 	}
-
 	re := regexp.MustCompile(oldDirective)
-
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".conf") {
 			filePath := filepath.Join(vhostDir, file.Name())
 			content, err := os.ReadFile(filePath)
 			if err != nil {
-				fmt.Printf("%sSkipping %s (read error): %v%s\n", shared.ColorYellow, file.Name(), err, shared.ColorReset)
 				continue
 			}
-
 			newContent := re.ReplaceAllString(string(content), newDirective)
-
-			if err = os.WriteFile(filePath, []byte(newContent), 0644); err != nil {
-				fmt.Printf("%sError writing to %s: %v%s\n", shared.ColorRed, file.Name(), err, shared.ColorReset)
-			}
+			os.WriteFile(filePath, []byte(newContent), 0644)
 		}
 	}
 	return nil
@@ -52,6 +87,7 @@ func applySecuritySettingsToVhosts(isDevMode bool) error {
 func ToggleDevelopmentMode() {
 	isApacheRunning := IsServiceRunning("httpd.exe")
 	isMySQLRunning := IsServiceRunning("mysqld.exe")
+	isPgRunning := IsServiceRunning("postgres.exe")
 
 	config, err := GetConfig()
 	if err != nil {
@@ -61,9 +97,11 @@ func ToggleDevelopmentMode() {
 
 	newMode := !config.DevelopmentMode
 
-	if err := applySecuritySettingsToVhosts(newMode); err != nil {
+	if err := applyApacheSecuritySettings(newMode); err != nil {
 		fmt.Printf("%sFailed to apply Apache security settings: %v%s\n", shared.ColorRed, err, shared.ColorReset)
-		return
+	}
+	if err := applyPostgresSecuritySettings(newMode); err != nil {
+		fmt.Printf("%sFailed to apply PostgreSQL security settings: %v%s\n", shared.ColorRed, err, shared.ColorReset)
 	}
 
 	config.DevelopmentMode = newMode
@@ -79,14 +117,14 @@ func ToggleDevelopmentMode() {
 	}
 
 	if isApacheRunning {
-		fmt.Println(shared.ColorYellow + "Restarting Apache to apply changes..." + shared.ColorReset)
 		RestartApache()
 	}
-
 	if isMySQLRunning {
-		fmt.Println(shared.ColorYellow + "Restarting MySQL to apply changes..." + shared.ColorReset)
 		StopMySQL()
 		time.Sleep(1 * time.Second)
 		StartMySQL()
+	}
+	if isPgRunning {
+		RestartPostgreSQL()
 	}
 }

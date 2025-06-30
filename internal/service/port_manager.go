@@ -137,6 +137,38 @@ func changeMySQLPort(reader *bufio.Reader, config *Config) {
 		return
 	}
 
+	phpMyAdminConfigPath := `C:\Gecko\etc\phpmyadmin\config.inc.php`
+	if _, err := os.Stat(phpMyAdminConfigPath); err == nil {
+		fmt.Printf("%sUpdating phpMyAdmin configuration...%s\n", shared.ColorYellow, shared.ColorReset)
+
+		content, err := os.ReadFile(phpMyAdminConfigPath)
+		if err != nil {
+			fmt.Printf("%sFailed to read phpMyAdmin config: %v%s\n", shared.ColorRed, err, shared.ColorReset)
+			return
+		}
+
+		lines := strings.Split(string(content), "\n")
+		var resultLines []string
+		portLineFound := false
+
+		for _, line := range lines {
+			match, _ := regexp.MatchString(`^\s*\$cfg\['Servers'\]\[\$i\]\['port'\]`, line)
+			if match {
+				resultLines = append(resultLines, fmt.Sprintf("$cfg['Servers'][$i]['port'] = '%s';", newPortStr))
+				portLineFound = true
+			} else {
+				resultLines = append(resultLines, line)
+			}
+		}
+
+		if !portLineFound {
+			resultLines = append(resultLines, fmt.Sprintf("\n$cfg['Servers'][$i]['port'] = '%s';", newPortStr))
+		}
+
+		output := strings.Join(resultLines, "\n")
+		os.WriteFile(phpMyAdminConfigPath, []byte(output), 0644)
+	}
+
 	fmt.Printf("%sMySQL port updated to %s in gecko-config.json.%s\n", shared.ColorGreen, newPortStr, shared.ColorReset)
 	fmt.Println(shared.ColorYellow + "Restart MySQL to apply the new port." + shared.ColorReset)
 }

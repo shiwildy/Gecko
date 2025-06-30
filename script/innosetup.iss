@@ -43,7 +43,7 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\etc\logo\logo.ico"
 
 [Registry]
-Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php\php;{app}\bin\mysql\bin;{app}\bin\ngrok;{app}\bin\pgsql\bin;{app}\bin\cloudflared"; Tasks: modifypath
+Root: HKCU; Subkey: "Environment"; ValueType: string; ValueName: "Path"; ValueData: "{olddata};{app}\bin\php\php;{app}\bin\mysql\bin;{app}\bin\ngrok;{app}\bin\pgsql\bin;{app}\bin\cloudflared;{app}\bin\composer"; Tasks: modifypath
 
 [Code]
 procedure SplitString(const S, Delim: string; var A: TArrayOfString);

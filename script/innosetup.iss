@@ -1,5 +1,5 @@
 #define MyAppName "Gecko"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 #define MyAppPublisher "ShiWildy"
 #define MyAppURL "https://github.com/shiwildy/Gecko.git"
 #define MyAppExeName "gecko.exe"

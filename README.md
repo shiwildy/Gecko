@@ -1,4 +1,6 @@
-<center><img src="logo.png" width="300px" height="auto"></img></center>
+<p align="center">
+  <img src="logo.png" width="300px" />
+</p>
 
 ### The sleekest, fastest CLI dev environment you’ll ever meet.
 

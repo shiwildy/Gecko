@@ -194,14 +194,19 @@ func DisplayMenu(apacheStatus, mysqlStatus, ngrokStatus, cloudflareStatus bool) 
 	printRow("8. Change Service Port", "9. View PgSQL Password")
 	printRow(" ")
 
+	printRow(fmt.Sprintf("%s:: PROJECT MANAGEMENT%s", shared.ColorYellow, shared.ColorReset))
+	printRow("10. Create New Project", "11. List Projects")
+	printRow("12. Delete Project", "")
+	printRow(" ")
+
 	printRow(fmt.Sprintf("%s:: TOOLS & TUNNELS%s", shared.ColorYellow, shared.ColorReset))
-	printRow("10. Switch PHP Version", "11. Install Root CA (SSL)")
-	printRow("12. Install Default SSL", ternary(ngrokStatus, "13. Stop Ngrok", "13. Start Ngrok"))
-	printRow("14. Set Ngrok Auth Token", ternary(cloudflareStatus, "15. Stop Cloudflare", "15. Start Cloudflare"))
+	printRow("13. Switch PHP Version", "14. Install Root CA (SSL)")
+	printRow("15. Install Default SSL", ternary(ngrokStatus, "16. Stop Ngrok", "16. Start Ngrok"))
+	printRow("17. Set Ngrok Auth Token", ternary(cloudflareStatus, "18. Stop Cloudflare", "18. Start Cloudflare"))
 
 	printRow(" ")
 	printRow(fmt.Sprintf("%s:: APPLICATION%s", shared.ColorYellow, shared.ColorReset))
-	printRow(ternary(devModeStatus, "16. Deactivate Dev Mode", "16. Activate Dev Mode"), "x. Exit")
+	printRow(ternary(devModeStatus, "19. Deactivate Dev Mode", "19. Activate Dev Mode"), "x. Exit")
 	printRow(" ")
 	fmt.Println("   ╚════════════════════════════════════════════════════════════════╝")
 }

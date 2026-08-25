@@ -38,10 +38,6 @@ Gecko gets it. That’s why it gives you:
 Fork it. Build it. PR it.  
 We love clean code, cool features, and passionate developers.
 
-## 👥 Community
-
-[**Join the Gecko User Group on Telegram!**](https://t.me/gecko_user)
-
 ## 📜 License
 
 Licensed under **GPLv3**. Read the `LICENSE` file like a responsible adult (or just start coding, we won’t judge).
